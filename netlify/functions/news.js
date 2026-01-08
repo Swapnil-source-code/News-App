@@ -1,6 +1,9 @@
 exports.handler = async (event) => {
-  const { country = "in", category = "top", language = "en" } =
-    event.queryStringParameters || {};
+  const {
+    country = "in",
+    language = "en",
+    category = "top"
+  } = event.queryStringParameters || {};
 
   const API_KEY = process.env.NEWSDATA_API_KEY;
 
@@ -12,12 +15,14 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        results: Array.isArray(data.results) ? data.results : []
+      }),
     };
   } catch (error) {
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Failed to fetch news" }),
+      statusCode: 200,
+      body: JSON.stringify({ results: [] }),
     };
   }
 };
