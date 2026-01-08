@@ -1,11 +1,10 @@
-const apiKey = "7bab3c52657147049a950ea579972862";
 let requestURL;
 
 const container = document.querySelector('.container');
 const optionContainer = document.querySelector('.options-container');
 
 const country = "in";
-const option = ["general","entertainment","health","science","sports","technology"];
+const option = ["top","entertainment","health","science","sports","technology"];
 
 
 
@@ -34,14 +33,26 @@ const generateUI = (articles) => {
 //News API Call
 const getNews = async () => {
   container.innerHTML = "";
+
   let response = await fetch(requestURL);
   if (!response.ok) {
     alert("Data unavailable at the moment, Please try again later");
-    return false;
+    return;
   }
+
   let data = await response.json();
-  generateUI(data.articles);
+
+  const articles = data.results.map((item) => ({
+    title: item.title,
+    description: item.description,
+    content: item.content,
+    url: item.link,
+    urlToImage: item.image_url
+  }));
+
+  generateUI(articles);
 };
+
 
 
 //Category 
@@ -52,7 +63,8 @@ const selectCategory = (e, category) => {
     element.classList.remove("active");
   });
 
-  requestURL = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=${apiKey}`;
+  requestURL = `/.netlify/functions/news?country=${country}&language=en&category=${category}`;
+
   e.target.classList.add("active");
   getNews();
 }
@@ -74,7 +86,7 @@ const init = () => {
 
 
 window.onload = () => {
-  requestURL = `https://newsapi.org/v2/top-headlines?country=${country}&category=general&apiKey=${apiKey}`;
+  requestURL = `/.netlify/functions/news?country=${country}&language=en&category=top`;
   init();
 };
 
